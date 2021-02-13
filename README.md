@@ -51,7 +51,7 @@ If you have **moved** the folder to a different path, simply run `install.sh` in
 
 # Upgrade
 
-To update, just `git pull` the latest release and then run `install.sh` again.  `install.sh` command will not replace your `docker-compose.yaml` and `.env`. But if we release a new update to that compose file, you can just delete your compose file and running `install.sh` will re-add latest `docker-composer.yaml`.
+To update, just `git pull && git checkout tags/<new release tag>` and then run `install.sh` again.  `install.sh` command will not replace your `docker-compose.yaml` and `.env`. But if we release a new update to that compose file, you can just delete your compose file and running `install.sh` will re-add latest `docker-composer.yaml`.
 
 # Tips & Tricks
 
