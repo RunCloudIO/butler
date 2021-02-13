@@ -1,0 +1,8 @@
+/.env
+/docker-compose.yaml
+/valet-ori
+/valet/vendor
+/valet/composer.lock
+/.valet-home
+/www
+.DS_Store

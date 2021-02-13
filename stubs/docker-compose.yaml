@@ -1,0 +1,50 @@
+version: '3.9'
+x-enviroment: &commonEnvironment
+  - VALET_HOME_PATH: ${VALET_HOME_PATH}
+  - VALET_STATIC_PREFIX: ${VALET_STATIC_PREFIX}
+  - VALET_SERVER_PATH: ${VALET_SERVER_PATH}
+  - PATH: /valet/master:$PATH
+
+services: 
+  webserver:
+    build:
+      context: docker/openresty
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+      - 443:443
+    working_dir: ${WORK_DIR_PATH}
+    volumes_from: 
+      - php
+    volumes:
+      - ./templates/nginx:/etc/nginx/templates
+    environment: 
+      <<: *commonEnvironment
+    depends_on: 
+      - php
+
+  php:
+    image: jtreminio/php:${BUTLER_PHP_VERSION}
+    environment: 
+      <<: *commonEnvironment
+    working_dir: ${WORK_DIR_PATH}
+    volumes:
+      - composer:/./composer
+      - ./valet:${VALET_PATH}
+      - ./.valet-home:${VALET_HOME_PATH}
+      - ${DEFAULT_WWW_PATH}:${WORK_DIR_PATH}
+
+  dns:
+    build:
+      context: docker/dnsmasq
+      dockerfile: Dockerfile
+    ports:
+      - 53:53/udp
+    environment: 
+      <<: *commonEnvironment
+    volumes:
+      - ./templates/dnsmasq:/etc/dnsmasq-templates
+    volumes_from: 
+      - php
+volumes:
+  composer:

@@ -1,0 +1,312 @@
+#!/usr/bin/env bash
+
+BUTLERRUNPATH="REPLACEME"
+VALET_HOME=".valet-home"
+CURRENTDIR="$(pwd)"
+UNAMEOUT="$(uname -s)"
+
+WHITE='\033[1;37m'
+NC='\033[0m'
+
+# Function that outputs Butler is not running...
+function butler_is_not_running {
+    echo -e "${WHITE}Butler is not running.${NC}" >&2
+    echo "" >&2
+    echo -e "${WHITE}You may Butler using the following command:${NC} 'butler up'" >&2
+
+    exit 1
+}
+
+function is_file_exist {
+    if test -f "$1"; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function generate_ca {
+    CA_PATH="$BUTLERRUNPATH/$VALET_HOME/CA/LaravelValetCASelfSigned.pem"
+    CA_KEY_PATH="$BUTLERRUNPATH/$VALET_HOME/CA/LaravelValetCASelfSigned.key"
+
+    if is_file_exist $CA_PATH && is_file_exist $CA_KEY_PATH ; then
+        return
+    else
+        #  Need to change name to distinguish between real Valet certificate
+        oName="Laravel Valet (Butler) CA Self Signed Organization";
+        cName="Laravel Valet (Butler) CA Self Signed CN";
+
+        # Remove existing CA and CA Key
+        rm $CA_PATH $CA_KEY_PATH 2> /dev/null
+
+        echo -e "${WHITE}Installing CA Cert. Enter password to install${NC}" >&2
+        # remove the old cert
+        sudo security delete-certificate -c $cName /Library/Keychains/System.keychain
+        openssl req -new -newkey rsa:2048 -days 10000 -nodes -x509 -subj "/C=MY/ST=Negeri Sembilan/O=$oName/localityName=Mantin/commonName=$cName/organizationalUnitName=Engineering/emailAddress=rootcertificate@runcloud.io/" -keyout $CA_KEY_PATH -out $CA_PATH
+        sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain $CA_PATH
+    fi
+}
+
+function get_tld {
+    # We dont want to use jq. so... KISS
+    cat $BUTLERRUNPATH/$VALET_HOME/config.json | tr { '\n' | tr , '\n' | tr } '\n' | grep "tld" | awk  -F'"' '{print $4}'
+}
+
+function trust_certificate {
+    tld=$(get_tld)
+
+    CERT_PATH="$BUTLERRUNPATH/$VALET_HOME/Certificates/$1.$tld.crt"
+
+    if is_file_exist $CERT_PATH; then
+        untrust_certificate $1
+        sudo security add-trusted-cert -d -r trustAsRoot -k /Library/Keychains/System.keychain $CERT_PATH
+    else
+        echo -e "${WHITE}Error:${NC} $CERT_PATH does not exists!" >&2
+    fi
+}
+
+function untrust_certificate {
+    tld=$(get_tld)
+
+    sudo security delete-certificate -c "$1.$tld" /Library/Keychains/System.keychain 2> /dev/null
+    sudo security delete-certificate -c "*.$1.$tld" /Library/Keychains/System.keychain 2> /dev/null
+}
+
+function untrust_old_certificates {
+    if [ -d $BUTLERRUNPATH/$VALET_HOME/Certificates-old ]; then
+        for filePath in $BUTLERRUNPATH/$VALET_HOME/Certificates-old/*.crt; do
+            fileName=$(basename $filePath)
+            domain="${fileName%.*}"
+            domainWithoutTLD="${domain%.*}"
+            untrust_certificate $domainWithoutTLD
+        done
+    fi
+
+    rm -rf $BUTLERRUNPATH/$VALET_HOME/Certificates-old 2> /dev/null
+}
+
+function valet_tld {
+    shift 1
+    workdir=$(get_workdir)
+    TLDCHANGE="no"
+    # if the $1 is not empty, then we are requesting tld change
+    if [ ! -z $1 ]; then
+        TLDCHANGE="yes"
+
+        # backup old certificates
+        backup_old_certificates
+        # untrust those cert
+        untrust_old_certificates
+    fi
+
+    # pass to valet
+    docker exec -i \
+        -w $workdir \
+        butler_php_1 \
+        valet tld "$@"
+
+    if [ $TLDCHANGE == "yes" ]; then
+        trust_new_certificates
+        reload_dnsmasq
+        reload_webserver
+    fi
+}
+
+function trust_new_certificates {
+    if [ -d $BUTLERRUNPATH/$VALET_HOME/Certificates ]; then
+        for filePath in $BUTLERRUNPATH/$VALET_HOME/Certificates/*.crt; do
+            fileName=$(basename $filePath)
+            domain="${fileName%.*}"
+            domainWithoutTLD="${domain%.*}"
+            trust_certificate $domainWithoutTLD
+        done
+    fi
+}
+
+function reload_webserver {
+    docker restart butler_webserver_1 > /dev/null 2>&1
+}
+
+function reload_dnsmasq {
+    docker restart butler_dns_1 > /dev/null 2>&1
+}
+
+function backup_old_certificates {
+    cp -r $BUTLERRUNPATH/$VALET_HOME/Certificates $BUTLERRUNPATH/$VALET_HOME/Certificates-old
+}
+
+function get_env_value {
+    VALUE=$(cat $BUTLERRUNPATH/.env | grep -o "$1=.*" | cut -f2- -d =)
+    echo $VALUE
+}
+
+function get_workdir {
+    www_path=$(get_env_value DEFAULT_WWW_PATH)
+
+    if [[ $CURRENTDIR/ = $www_path/* ]]; then
+        workdir=${CURRENTDIR//$www_path/}
+
+        if [ "$workdir" == "" ]; then
+            workdir="/"
+        fi
+
+        echo "/var/www$workdir"
+    else
+        echo "/var/www"
+    fi
+}
+
+# Verify operating system is supported... We add it here in case we wanted to support Linux and Windows too
+case "${UNAMEOUT}" in
+    Darwin*)            MACHINE=mac;;
+    *)                  MACHINE="UNKNOWN"
+esac
+
+if [ "$MACHINE" == "UNKNOWN" ]; then
+    echo -e "${WHITE}Unsupported operating system [$(uname -s)]. Butler only supports macOS${NC}" >&2
+
+    exit 1
+fi
+
+# Ensure that Docker is running...
+if ! docker info > /dev/null 2>&1; then
+    echo -e "${WHITE}Docker is not running.${NC}" >&2
+
+    exit 1
+fi
+
+
+if [ ! -d $BUTLERRUNPATH ] 
+then
+    echo -e "${WHITE}Uh oh... Butler directory does not exist. Please reinstall Butler..${NC}" >&2
+
+    exit 1
+fi
+
+cd $BUTLERRUNPATH
+
+# Need to make sure .env exist
+if ! is_file_exist $BUTLERRUNPATH/.env; then
+    echo -e "${WHITE}Uh oh... .env file not exists. Please run install.sh to reinstall${NC}" >&2
+    exit 1
+fi
+
+if [ "$1" == "start" ];then
+    docker-compose -p butler up -d
+    echo -e "${WHITE}Butler process started...${NC}" >&2
+    exit 0
+elif [ "$1" == "reset" ];then
+    echo -e "${WHITE}Remove all butler related processes...${NC}" >&2
+    docker-compose -p butler down
+    echo -e "${WHITE}Adding back butler processes...${NC}" >&2
+    docker-compose -p butler up -d
+    exit 0
+elif [ "$1" == "restart" ];then
+    echo -e "${WHITE}Restart all butler related processes...${NC}" >&2
+    docker-compose -p butler restart
+    exit 0
+elif [ "$1" == "reload" ];then
+    echo -e "${WHITE}Reload all butler related processes...${NC}" >&2
+    docker-compose -p butler up -d
+    exit 0
+elif [ "$1" == "stop" ];then
+    echo -e "${WHITE}Stopping all butler related processes...${NC}" >&2
+    docker-compose -p butler down
+    exit 0
+fi
+
+
+PSRESULT="$(docker ps | grep butler | wc -l)"
+
+if [[ PSRESULT -lt 2 ]]; then 
+    echo -e "${WHITE}Shutting down old Butler processes...${NC}" >&2
+
+    docker-compose -p butler down > /dev/null 2>&1
+
+    butler_is_not_running
+
+    exit 1
+fi
+
+
+# # Proxy PHP commands to the "php" binary on the application container...
+if [[ "$1" == "php" || "$1" == "valet" || $1 == "composer" || $1 == "artisan" ]]; then
+    COMMAND=$1
+    workdir=$(get_workdir)
+    shift 1
+
+    if [[ $COMMAND == "valet" && $1 == "secure" ]]; then
+        shift 1
+        # We need to install CA cert to keychain. so we interfere valet secure and only after that we pass to valet command
+        # Do the CA installation here
+        generate_ca
+
+        if [ -z $1 ]; then
+            CN=$(basename $CURRENTDIR)
+        else
+            CN=$1
+        fi
+
+        docker exec -i \
+            -w $workdir \
+            butler_php_1 \
+            valet secure $CN
+
+        trust_certificate $CN
+        reload_webserver
+    elif [[ $COMMAND == "valet" && $1 == "unsecure" ]]; then
+        shift 1
+        if [ -z $1 ]; then
+            CN=$(basename $CURRENTDIR)
+        else
+            CN=$1
+        fi
+
+        docker exec -i \
+            -w $workdir \
+            butler_php_1 \
+            valet unsecure $CN
+
+        untrust_certificate $CN
+        reload_webserver
+    elif [[ $COMMAND == "valet" && $1 == "proxy" ]]; then
+        shift 1
+
+        docker exec -i \
+            butler_php_1 \
+            valet proxy "$@"
+        reload_webserver
+    elif [[ $COMMAND == "valet" && $1 == "unproxy" ]]; then
+        shift 1
+        
+        docker exec -i \
+            -w $workdir \
+            butler_php_1 \
+            valet unproxy "$@"
+        reload_webserver
+    elif [[ $COMMAND == "valet" && $1 == "tld" ]]; then
+        valet_tld "$@"
+    elif [[ $COMMAND == "artisan" || $command == "art" ]]; then
+        shift 1
+        docker exec -i \
+            -w $workdir \
+            butler_php_1 \
+            php artisan "$@"
+    else
+        docker exec -i \
+            -w $workdir \
+            butler_php_1 \
+            $COMMAND "$@"
+    fi
+elif [ "$1" == "tld" ];then
+    valet_tld "$@"
+elif [ "$1" == "down" ];then
+    docker-compose -p butler stop
+else
+    workdir=$(get_workdir)
+
+    docker exec -i \
+        -w $workdir \
+        butler_php_1 \
+        valet "$@"
+fi

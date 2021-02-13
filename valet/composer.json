@@ -1,0 +1,46 @@
+{
+    "name": "laravel/valet",
+    "description": "A more enjoyable local development experience for Mac.",
+    "keywords": ["laravel", "zonda", "wwdhhd"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylor@laravel.com"
+        },
+        {
+            "name": "Adam Wathan",
+            "email": "adam.wathan@gmail.com"
+        }
+    ],
+    "autoload": {
+        "files": [
+            "cli/includes/compatibility.php",
+            "cli/includes/facades.php",
+            "cli/includes/helpers.php"
+        ],
+        "psr-4": {
+            "Valet\\": "cli/Valet/"
+        }
+    },
+    "require": {
+        "php": ">=5.6",
+        "illuminate/container": "~5.1|^6.0|^7.0|^8.0",
+        "mnapoli/silly": "~1.0",
+        "symfony/process": "~3.0|~4.0|~5.0",
+        "nategood/httpful": "~0.2",
+        "tightenco/collect": "^5.3|^6.0|^7.0|^8.0"
+    },
+    "require-dev": {
+        "mockery/mockery": "^1.2.3",
+        "yoast/phpunit-polyfills": "^0.2.0"
+    },
+    "bin": [
+        "valet"
+    ],
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.x-dev"
+        }
+    }
+}

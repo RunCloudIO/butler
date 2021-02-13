@@ -1,0 +1,6 @@
+{
+    "tld": "test",
+    "paths": [
+        "/var/www/default"
+    ]
+}
