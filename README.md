@@ -50,6 +50,18 @@ $ ./install.sh
 
 To update, just `git pull` and then run `install.sh` again. If you have **moved** the folder to a different path, simply run `install.sh` inside the new path to make sure `butler` command know about it.
 
+# Tips & Tricks
+
+To make your life easier, it is better to use your daily command rather than invoking `butler` directly. Before doing this, make sure you have **REMOVE** Laravel Valet completely. So, here it is. Edit `~/.bash_profile` and append these lines:
+
+```
+alias valet="butler valet"
+alias php="butler php"
+alias composer="butler composer"
+```
+
+After that, `source ~/.bash_profile` and you may use `valet`, `php`, `composer` just like you have installed them natively.
+
 # Usage
 
 ### Basic usage
