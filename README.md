@@ -47,15 +47,18 @@ $ ./install.sh
 ```
 **IMPORTANT PART**. After the installation succeeded, change your DNS inside System Preferences > Network > Advanced > DNS to **`127.0.0.1`**. Failure to do so **will prevent** you from running custom domain TLD.
 
+If you have **moved** the folder to a different path, simply run `install.sh` inside the new path to make sure `butler` command know about it.
 
-To update, just `git pull` and then run `install.sh` again. If you have **moved** the folder to a different path, simply run `install.sh` inside the new path to make sure `butler` command know about it.
+# Upgrade
+
+To update, just `git pull` the latest release and then run `install.sh` again.  `install.sh` command will not replace your `docker-compose.yaml` and `.env`. But if we release a new update to that compose file, you can just delete your compose file and running `install.sh` will re-add latest `docker-composer.yaml`.
 
 # Tips & Tricks
 
 To make your life easier, it is better to use your daily command rather than invoking `butler` directly. Before doing this, make sure you have **REMOVE** Laravel Valet completely. So, here it is. Edit `~/.bash_profile` and append these lines:
 
 ```
-alias valet="butler valet"
+alias valet="butler"
 alias php="butler php"
 alias composer="butler composer"
 ```
@@ -100,3 +103,9 @@ Since we are using Docker, **changing PHP version** is **easier** than ever. You
 You can only run `butler valet park` or `butler valet link` inside`DEFAULT_WWW_PATH` defined in `.env`. If you run these command outside the `DEFAULT_WWW_PATH` directory, it will automatically run your command inside `/var/www` in the container. 
 
 You may create another folder inside `DEFAULT_WWW_PATH` and register it as new parked paths or linked path. So you can divide your codebase per project basis inside here. E.g: `/var/www/{defaults,project1,project2,project3,link1,link2}`.
+
+### Moving working directory
+
+You probably didn't like the idea of having `www` folder inside this cloned repo. For example, you clone this project into `/Users/<username>/Documents/tools/butler` and getting into that `www` directory is too much. 
+
+To change this, you need to update `.env` file and `DEFAULT_WWW_PATH` to a new path, let say your Desktop. Make sure to use absolute path when defining `DEFAULT_WWW_PATH`. Give it a reload (`butler reload`) and check whether your site still registered with Valet, `butler paths`.
