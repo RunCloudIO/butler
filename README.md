@@ -120,7 +120,33 @@ Since we are using Docker, **changing PHP version** is **easier** than ever. You
 
 You can only run `butler valet park` or `butler valet link` inside`DEFAULT_WWW_PATH` defined in `.env`. If you run these command outside the `DEFAULT_WWW_PATH` directory, it will automatically run your command inside `/var/www` in the container. 
 
-You may create another folder inside `DEFAULT_WWW_PATH` and register it as new parked paths or linked path. So you can divide your codebase per project basis inside here. E.g: `/var/www/{defaults,project1,project2,project3,link1,link2}`.
+You may create another folder inside `DEFAULT_WWW_PATH` and register it as new parked paths or linked path. So you can divide your codebase per project basis inside here. To give you the idea, take a look at the sample below.
+
+```
+...
+└── www
+    ├── default
+    │   ├── mysite
+    │   │   └── index.php
+    │   ├── mysite2
+    │   │   └── index.php
+    │   └── mysite3
+    │       └── index.php
+    ├── link1
+    │   └── index.php
+    ├── link2
+    │   └── index.php
+    ├── project1
+    │   ├── backend
+    │   │   └── index.php
+    │   └── frontend
+    │       └── index.php
+    └── project2
+        ├── backend
+        │   └── index.php
+        └── frontend
+            └── index.php
+```
 
 ### Moving working directory
 
