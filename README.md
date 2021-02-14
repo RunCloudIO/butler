@@ -45,7 +45,12 @@ $ git clone https://github.com/RunCloudIO/butler.git
 $ cd butler
 $ ./install.sh
 ```
-**IMPORTANT PART**. After the installation succeeded, change your DNS inside System Preferences > Network > Advanced > DNS to **`127.0.0.1`**. Failure to do so **will prevent** you from running custom domain TLD.
+**IMPORTANT PART**. After the installation succeeded, change your DNS inside System Preferences > Network > Advanced > DNS to 
+```
+127.0.0.1
+```
+
+Failure to do so **will prevent** you from running custom domain TLD.
 
 If you have **moved** the folder to a different path, simply run `install.sh` inside the new path to make sure `butler` command know about it.
 
