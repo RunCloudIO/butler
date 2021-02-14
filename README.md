@@ -179,3 +179,21 @@ apps:
 ```
 
 Then start PM2 with `pm2 start pm2-queue.yaml`
+
+# Troubleshooting Guides
+
+### Valet 404 Page
+
+Check whether your site exists using either command
+
+```
+$ butler parked
+$ butler links
+$ butler proxies
+```
+
+If it does not exist, inside any, check whether the path has been loaded inside valet
+
+```
+$ butler paths
+```
