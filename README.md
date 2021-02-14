@@ -60,7 +60,16 @@ If you have **moved** the folder to a different path, simply run `install.sh` in
 
 # Upgrade
 
-To update, just `git pull && git checkout tags/$(curl --silent "https://api.github.com/repos/RunCloudIO/butler/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')` and then run `install.sh` again.  `install.sh` command will not replace your `docker-compose.yaml` and `.env`. But if we release a new update to that compose file, you can just delete your compose file and running `install.sh` will re-add latest `docker-composer.yaml`.
+To update, just 
+
+```
+$ cd /path/to/butler
+$ git pull
+$ git checkout tags/$(curl --silent "https://api.github.com/repos/RunCloudIO/butler/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+$ ./install.sh
+```
+
+`install.sh` command will not replace your `docker-compose.yaml` and `.env`. But if we release a new update to that compose file, you can just delete your compose file and running `install.sh` will re-add latest `docker-composer.yaml`.
 
 # Tips & Tricks
 
