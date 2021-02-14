@@ -5,4 +5,5 @@
 /valet/composer.lock
 /.valet-home
 /www
+!/www/*
 .DS_Store
