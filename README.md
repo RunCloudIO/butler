@@ -12,7 +12,7 @@ Like every programmer, instead of fixing broken things. Why not make a new solut
 
 To make things simple inside your development machine, Butler should make your life easy without having to install PHP, Nginx or DNSmasq inside your Mac. Thus, keeping your Mac clean and you can easily setup your development environment when you buy a new Mac with your hard earned money.
 
-Butler aim to replicate the simplicity of using Laravel Valet and thus I will not add other cool shit feature to Butler if it does not available inside Laravel Valet. Any **PR** that add a feature which not exist inside Valet will **be rejected** without hesitation. This project is my first project in Docker because I want to learn how to use Docker. There will be part of this code which you will feel like a **n00b** that code this project, and that is because it is. If you have any improvement to make, don't hesitate to make PR or the noob code will stay forever.
+Butler aim to replicate the simplicity of using Laravel Valet and thus I will not add other cool shit feature to Butler if it does not available inside Laravel Valet. Any **PR** that add a feature which not exist inside Valet will **be rejected** without hesitation. This project is my first project in Docker because I want to learn how to use Docker. There will be part of this code which you will feel like a **n00b** who wrote this project, and that is because it is. If you have any improvement to make, don't hesitate to make PR or the noob code will stay forever.
 
 # Todo
 
