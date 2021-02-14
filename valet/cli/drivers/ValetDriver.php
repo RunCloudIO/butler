@@ -48,7 +48,7 @@ abstract class ValetDriver
             $drivers[] = $customSiteDriver;
         }
 
-        $drivers = array_merge($drivers, static::driversIn(VALET_HOME_PATH.'/Drivers'));
+        $drivers = array_merge($drivers, static::driversIn(VALET_HOME_PATH . '/Drivers'));
 
         $drivers[] = 'LaravelValetDriver';
 
@@ -90,11 +90,11 @@ abstract class ValetDriver
      */
     public static function customSiteDriver($sitePath)
     {
-        if (! file_exists($sitePath.'/LocalValetDriver.php')) {
+        if (!file_exists($sitePath . '/LocalValetDriver.php')) {
             return;
         }
 
-        require_once $sitePath.'/LocalValetDriver.php';
+        require_once $sitePath . '/LocalValetDriver.php';
 
         return 'LocalValetDriver';
     }
@@ -107,15 +107,15 @@ abstract class ValetDriver
      */
     public static function driversIn($path)
     {
-        if (! is_dir($path)) {
+        if (!is_dir($path)) {
             return [];
         }
 
         $drivers = [];
 
-        $dir = new RecursiveDirectoryIterator($path);
+        $dir      = new RecursiveDirectoryIterator($path);
         $iterator = new RecursiveIteratorIterator($dir);
-        $regex = new RegexIterator($iterator, '/^.+ValetDriver\.php$/i', RecursiveRegexIterator::GET_MATCH);
+        $regex    = new RegexIterator($iterator, '/^.+ValetDriver\.php$/i', RecursiveRegexIterator::GET_MATCH);
 
         foreach ($regex as $file) {
             require_once $file[0];
@@ -177,7 +177,7 @@ abstract class ValetDriver
      */
     protected function isActualFile($path)
     {
-        return ! is_dir($path) && file_exists($path);
+        return !is_dir($path) && file_exists($path);
     }
 
     /**
@@ -191,10 +191,10 @@ abstract class ValetDriver
     public function loadServerEnvironmentVariables($sitePath, $siteName)
     {
         $varFilePath = $sitePath . '/.valet-env.php';
-        if (! file_exists($varFilePath)) {
+        if (!file_exists($varFilePath)) {
             $varFilePath = VALET_HOME_PATH . '/.valet-env.php';
         }
-        if (! file_exists($varFilePath)) {
+        if (!file_exists($varFilePath)) {
             return;
         }
 
@@ -207,9 +207,12 @@ abstract class ValetDriver
         }
 
         foreach ($variablesToSet as $key => $value) {
-            if (! is_string($key)) continue;
+            if (!is_string($key)) {
+                continue;
+            }
+
             $_SERVER[$key] = $value;
-            $_ENV[$key] = $value;
+            $_ENV[$key]    = $value;
             putenv($key . '=' . $value);
         }
     }

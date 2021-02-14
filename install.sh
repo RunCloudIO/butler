@@ -47,7 +47,7 @@ fi
 
 if [ ! -f .env ]; then
     cp ./stubs/.env .env
-    sed -i '' "s|REPLACEME|$PWD/www|g" ./.env
+    sed -i '' "s|REPLACEME|$PWD/www/|g" ./.env
 fi
 
 if [ ! -f docker-compose.yaml ]; then
