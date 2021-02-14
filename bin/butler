@@ -112,6 +112,75 @@ function valet_tld {
     fi
 }
 
+function valet_secure {
+    workdir=$(get_workdir)
+    shift 1
+    # We need to install CA cert to keychain. so we interfere valet secure and only after that we pass to valet command
+    # Do the CA installation here
+    generate_ca
+
+    if [ -z $1 ]; then
+        CN=$(basename $CURRENTDIR)
+    else
+        CN=$1
+    fi
+
+    docker exec -i \
+        -w $workdir \
+        butler_php_1 \
+        valet secure $CN
+
+    trust_certificate $CN
+    reload_webserver
+}
+
+function valet_unsecure {
+    workdir=$(get_workdir)
+    shift 1
+    if [ -z $1 ]; then
+        CN=$(basename $CURRENTDIR)
+    else
+        CN=$1
+    fi
+
+    docker exec -i \
+        -w $workdir \
+        butler_php_1 \
+        valet unsecure $CN
+
+    untrust_certificate $CN
+    reload_webserver
+}
+
+function valet_proxy {
+    workdir=$(get_workdir)
+    shift 1
+
+    CN=$1
+
+    docker exec -i \
+        butler_php_1 \
+        valet proxy "$@"
+        
+    trust_certificate $CN
+    reload_webserver
+}
+
+function valet_unproxy {
+    workdir=$(get_workdir)
+    shift 1
+
+    CN=$1
+    
+    docker exec -i \
+        -w $workdir \
+        butler_php_1 \
+        valet unproxy "$@"
+
+    untrust_certificate $CN
+    reload_webserver
+}
+
 function trust_new_certificates {
     if [ -d $BUTLERRUNPATH/$VALET_HOME/Certificates ]; then
         for filePath in $BUTLERRUNPATH/$VALET_HOME/Certificates/*.crt; do
@@ -236,54 +305,13 @@ if [[ "$1" == "php" || "$1" == "valet" || $1 == "composer" || $1 == "artisan" ]]
     shift 1
 
     if [[ $COMMAND == "valet" && $1 == "secure" ]]; then
-        shift 1
-        # We need to install CA cert to keychain. so we interfere valet secure and only after that we pass to valet command
-        # Do the CA installation here
-        generate_ca
-
-        if [ -z $1 ]; then
-            CN=$(basename $CURRENTDIR)
-        else
-            CN=$1
-        fi
-
-        docker exec -i \
-            -w $workdir \
-            butler_php_1 \
-            valet secure $CN
-
-        trust_certificate $CN
-        reload_webserver
+        valet_secure "$@"
     elif [[ $COMMAND == "valet" && $1 == "unsecure" ]]; then
-        shift 1
-        if [ -z $1 ]; then
-            CN=$(basename $CURRENTDIR)
-        else
-            CN=$1
-        fi
-
-        docker exec -i \
-            -w $workdir \
-            butler_php_1 \
-            valet unsecure $CN
-
-        untrust_certificate $CN
-        reload_webserver
+        valet_unsecure "$@"
     elif [[ $COMMAND == "valet" && $1 == "proxy" ]]; then
-        shift 1
-
-        docker exec -i \
-            butler_php_1 \
-            valet proxy "$@"
-        reload_webserver
+        valet_proxy "$@"
     elif [[ $COMMAND == "valet" && $1 == "unproxy" ]]; then
-        shift 1
-        
-        docker exec -i \
-            -w $workdir \
-            butler_php_1 \
-            valet unproxy "$@"
-        reload_webserver
+        valet_unsecure "$@"
     elif [[ $COMMAND == "valet" && $1 == "tld" ]]; then
         valet_tld "$@"
     elif [[ $COMMAND == "artisan" || $command == "art" ]]; then
@@ -298,6 +326,14 @@ if [[ "$1" == "php" || "$1" == "valet" || $1 == "composer" || $1 == "artisan" ]]
             butler_php_1 \
             $COMMAND "$@"
     fi
+elif [ "$1" == "secure" ];then
+    valet_secure "$@"
+elif [ "$1" == "unsecure" ];then
+    valet_unsecure "$@"
+elif [ "$1" == "proxy" ];then
+    valet_proxy "$@"
+elif [ "$1" == "unproxy" ];then
+    valet_unproxy "$@"
 elif [ "$1" == "tld" ];then
     valet_tld "$@"
 elif [ "$1" == "down" ];then
