@@ -47,6 +47,23 @@ function generate_ca {
     fi
 }
 
+function get_workdir {
+    www_path=$(get_env_value DEFAULT_WWW_PATH)
+    www_path=${www_path%/}
+
+    if test "${CURRENTDIR##$www_path}" != "$CURRENTDIR"; then
+        workdir=${CURRENTDIR//$www_path/}
+
+        if [ "$workdir" == "" ]; then
+            workdir="/"
+        fi
+
+        echo "/var/www$workdir"
+    else
+        echo "/var/www"
+    fi
+}
+
 function get_tld {
     # We dont want to use jq. so... KISS
     cat $BUTLERRUNPATH/$VALET_HOME/config.json | tr { '\n' | tr , '\n' | tr } '\n' | grep "tld" | awk  -F'"' '{print $4}'
@@ -207,22 +224,6 @@ function backup_old_certificates {
 function get_env_value {
     VALUE=$(cat $BUTLERRUNPATH/.env | grep -o "$1=.*" | cut -f2- -d =)
     echo $VALUE
-}
-
-function get_workdir {
-    www_path=$(get_env_value DEFAULT_WWW_PATH)
-
-    if [[ $CURRENTDIR/ = $www_path/* ]]; then
-        workdir=${CURRENTDIR//$www_path/}
-
-        if [ "$workdir" == "" ]; then
-            workdir="/"
-        fi
-
-        echo "/var/www$workdir"
-    else
-        echo "/var/www"
-    fi
 }
 
 # Verify operating system is supported... We add it here in case we wanted to support Linux and Windows too

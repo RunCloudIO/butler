@@ -154,9 +154,6 @@ You probably didn't like the idea of having `www` folder inside this cloned repo
 
 To change this, you need to update `.env` file and `DEFAULT_WWW_PATH` to a new path, let say your Desktop. Make sure to use absolute path when defining `DEFAULT_WWW_PATH`. Give it a reload (`butler reload`) and check whether your site still registered with Valet, using `butler parked` or `butler links`.
 
-
-**WARNING!!** When changing `DEFAULT_WWW_PATH`, you must end the path with `/`. E.g: `/var/www/` and not `/var/www`.
-
 ### Laravel Queue
 
 **[Need better documentation]**
