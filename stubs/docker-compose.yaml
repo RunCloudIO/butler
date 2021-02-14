@@ -42,6 +42,7 @@ services:
       - 53:53/udp
     environment: 
       <<: *commonEnvironment
+      PHP_INI_SCAN_DIR: ${BUTLER_PHP_MODULES}
     volumes:
       - ./templates/dnsmasq:/etc/dnsmasq-templates
     volumes_from: 
