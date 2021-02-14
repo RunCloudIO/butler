@@ -126,13 +126,13 @@ You may create another folder inside `DEFAULT_WWW_PATH` and register it as new p
 
 You probably didn't like the idea of having `www` folder inside this cloned repo. For example, you clone this project into `/Users/<username>/Documents/tools/butler` and getting into that `www` directory is too much. 
 
-To change this, you need to update `.env` file and `DEFAULT_WWW_PATH` to a new path, let say your Desktop. Make sure to use absolute path when defining `DEFAULT_WWW_PATH`. Give it a reload (`butler reload`) and check whether your site still registered with Valet, `butler paths`.
+To change this, you need to update `.env` file and `DEFAULT_WWW_PATH` to a new path, let say your Desktop. Make sure to use absolute path when defining `DEFAULT_WWW_PATH`. Give it a reload (`butler reload`) and check whether your site still registered with Valet, using `butler parked` or `butler links`.
 
 ### Laravel Queue
 
 **[Need better documentation]**
 
-Since you did not install PHP inside your Mac, you also can't run `php artisan queue:work` using Supervisor. Right now I have no idea how to run Supervisor, but there is a way without using Supervisor, which is using [PM2](https://www.npmjs.com/package/pm2). This suggestion still need a better implementation.
+Since you didn't install PHP inside your Mac, you also can't run `php artisan queue:work` using Supervisor. Right now I have no idea how to run Supervisor, but there is a way without using Supervisor, which is using [PM2](https://www.npmjs.com/package/pm2). This suggestion still need a better implementation.
 
 Create `queue-helper.sh` inside your project folder and the content is
 
