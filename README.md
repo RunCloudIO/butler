@@ -113,6 +113,7 @@ To change this, you need to update `.env` file and `DEFAULT_WWW_PATH` to a new p
 ### Laravel Queue
 
 **[Need better documentation]**
+
 Since you did not install PHP inside your Mac, you also can't run `php artisan queue:work` using Supervisor. Right now I have no idea how to run Supervisor, but there is a way without using Supervisor, which is using [PM2](https://www.npmjs.com/package/pm2). This suggestion still need a better implementation.
 
 Create `queue-helper.sh` inside your project folder and the content is
