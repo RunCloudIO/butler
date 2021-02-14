@@ -23,6 +23,9 @@ Butler aim to replicate the simplicity of using Laravel Valet and thus I will no
 # TLDR;
 
 ```
+$ git clone https://github.com/RunCloudIO/butler.git
+$ cd butler
+$ git checkout tags/$(curl --silent "https://api.github.com/repos/RunCloudIO/butler/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 $ ./install.sh
 $ cd www/default
 $ mkdir mysite
@@ -43,6 +46,7 @@ To start with Butler, clone this repository and run `install.sh`
 ```
 $ git clone https://github.com/RunCloudIO/butler.git
 $ cd butler
+$ git checkout tags/$(curl --silent "https://api.github.com/repos/RunCloudIO/butler/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 $ ./install.sh
 ```
 **IMPORTANT PART**. After the installation succeeded, change your DNS inside System Preferences > Network > Advanced > DNS to 
@@ -56,7 +60,7 @@ If you have **moved** the folder to a different path, simply run `install.sh` in
 
 # Upgrade
 
-To update, just `git pull && git checkout tags/<new release tag>` and then run `install.sh` again.  `install.sh` command will not replace your `docker-compose.yaml` and `.env`. But if we release a new update to that compose file, you can just delete your compose file and running `install.sh` will re-add latest `docker-composer.yaml`.
+To update, just `git pull && git checkout tags/$(curl --silent "https://api.github.com/repos/RunCloudIO/butler/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')` and then run `install.sh` again.  `install.sh` command will not replace your `docker-compose.yaml` and `.env`. But if we release a new update to that compose file, you can just delete your compose file and running `install.sh` will re-add latest `docker-composer.yaml`.
 
 # Tips & Tricks
 
