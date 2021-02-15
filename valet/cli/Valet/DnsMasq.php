@@ -71,6 +71,7 @@ class DnsMasq
         info('Updating Dnsmasq configuration...');
 
         $this->files->ensureDirExists(VALET_HOME_PATH . '/dnsmasq.d', user());
+        $this->files->ensureDirExists(VALET_HOME_PATH . '/dnsmasq-internal.d', user());
     }
 
     /**
@@ -80,9 +81,11 @@ class DnsMasq
      */
     public function createDnsmasqTldConfigFile($tld)
     {
-        $tldConfigFile = $this->dnsmasqUserConfigDir() . 'tld-' . $tld . '.conf';
+        $tldConfigFile         = $this->dnsmasqUserConfigDir() . 'tld-' . $tld . '.conf';
+        $tldInternalConfigFile = $this->dnsmasqInternalConfigDir() . 'tld-' . $tld . '.conf';
 
         $this->files->putAsUser($tldConfigFile, 'address=/.' . $tld . '/127.0.0.1' . PHP_EOL);
+        $this->files->putAsUser($tldInternalConfigFile, 'address=/.' . $tld . '/' . BUTLER_WEBSERVER_IP . PHP_EOL);
     }
 
     /**
@@ -96,6 +99,7 @@ class DnsMasq
     {
         $this->files->unlink($this->resolverPath . '/' . $oldTld);
         $this->files->unlink($this->dnsmasqUserConfigDir() . 'tld-' . $oldTld . '.conf');
+        $this->files->unlink($this->dnsmasqInternalConfigDir() . 'tld-' . $oldTld . '.conf');
 
         $this->install($newTld);
     }
@@ -108,5 +112,10 @@ class DnsMasq
     public function dnsmasqUserConfigDir()
     {
         return VALET_HOME_PATH . '/dnsmasq.d/';
+    }
+
+    public function dnsmasqInternalConfigDir()
+    {
+        return VALET_HOME_PATH . '/dnsmasq-internal.d/';
     }
 }

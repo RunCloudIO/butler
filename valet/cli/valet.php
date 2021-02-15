@@ -31,7 +31,7 @@ if (is_dir(VALET_LEGACY_HOME_PATH) && !is_dir(VALET_HOME_PATH)) {
  */
 Container::setInstance(new Container);
 
-$version = '0.0.4';
+$version = '0.0.5';
 
 $app = new Application('Laravel Valet (Butler)', $version);
 

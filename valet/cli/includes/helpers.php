@@ -11,6 +11,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
  * Define the ~/.config/valet path as a constant.
  */
 define('VALET_HOME_PATH', getenv('VALET_HOME_PATH'));
+define('BUTLER_WEBSERVER_IP', getenv('BUTLER_WEBSERVER_IP'));
 define('VALET_SERVER_PATH', getenv('VALET_SERVER_PATH'));
 define('VALET_STATIC_PREFIX', getenv('VALET_STATIC_PREFIX'));
 

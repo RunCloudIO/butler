@@ -36,7 +36,7 @@ fi
 
 
 mkdir -p www
-mkdir -p $VALET_HOME/{CA,Certificates,Drivers,Extensions,Log,Nginx,Sites,dnsmasq.d}
+mkdir -p $VALET_HOME/{CA,Certificates,Drivers,Extensions,Log,Nginx,Sites,dnsmasq.d,dnsmasq-internal.d}
 touch $VALET_HOME/Log/nginx-error.log
 cp ./valet/cli/stubs/SampleValetDriver.php $VALET_HOME/Drivers/SampleValetDriver.php
 
@@ -62,6 +62,12 @@ echo "Waiting for Butler services to start..."
 butler start
 docker exec -i -w /valet/master butler_php_1 composer install -vvv
 butler install
+
+# echo "Register as sudoers..."
+
+# echo -e "Cmnd_Alias BUTLER = /usr/local/bin/butler *
+# %admin ALL=(root) NOPASSWD:SETENV: BUTLER" | sudo tee /etc/sudoers.d/butler > /dev/null
+
 
 echo -e "${WHITE}
 

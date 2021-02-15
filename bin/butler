@@ -214,7 +214,8 @@ function reload_webserver {
 }
 
 function reload_dnsmasq {
-    docker restart butler_dns_1 > /dev/null 2>&1
+    docker restart butler_dns_1 butler_dns-internal_1 > /dev/null 2>&1
+    sudo killall -HUP mDNSResponder
 }
 
 function backup_old_certificates {
@@ -277,7 +278,11 @@ elif [ "$1" == "restart" ];then
     exit 0
 elif [ "$1" == "reload" ];then
     echo -e "${WHITE}Reload all butler related processes...${NC}" >&2
+    docker exec -i \
+        butler_php_1 \
+        valet install
     docker-compose -p butler up -d
+    docker-compose -p butler restart
     exit 0
 elif [ "$1" == "stop" ];then
     echo -e "${WHITE}Stopping all butler related processes...${NC}" >&2

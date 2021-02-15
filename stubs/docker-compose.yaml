@@ -22,18 +22,30 @@ services:
       <<: *commonEnvironment
     depends_on: 
       - php
+    networks:
+      vpc:
+        ipv4_address: ${BUTLER_WEBSERVER_IP:-10.172.0.10}
 
   php:
-    image: jtreminio/php:${BUTLER_PHP_VERSION}
+    image: jtreminio/php:${BUTLER_PHP_VERSION:-8.0}
+    dns:
+      - ${BUTLER_DNS_INTERNAL_IP:-10.172.0.101}
+    extra_hosts:
+      - "host.docker.internal:${BUTLER_GATEWAY:-10.172.0.1}"
     environment: 
       <<: *commonEnvironment
+      PHP_INI_SCAN_DIR: ${BUTLER_PHP_MODULES}
+      BUTLER_WEBSERVER_IP: ${BUTLER_WEBSERVER_IP:-10.172.0.10}
     working_dir: ${WORK_DIR_PATH}
     volumes:
       - composer:/./composer
       - ./valet:${VALET_PATH}
       - ./.valet-home:${VALET_HOME_PATH}
       - ${DEFAULT_WWW_PATH}:${WORK_DIR_PATH}
-
+    networks:
+      vpc:
+        ipv4_address: ${BUTLER_PHP_IP:-10.172.0.11}
+  
   dns:
     build:
       context: docker/dnsmasq
@@ -42,10 +54,35 @@ services:
       - 53:53/udp
     environment: 
       <<: *commonEnvironment
-      PHP_INI_SCAN_DIR: ${BUTLER_PHP_MODULES}
     volumes:
       - ./templates/dnsmasq:/etc/dnsmasq-templates
     volumes_from: 
       - php
+    networks:
+      vpc:
+        ipv4_address: ${BUTLER_DNS_IP:-10.172.0.100}
+
+  dns-internal:
+    image: butler_dns
+    ports:
+      - 53/udp
+    environment: 
+      <<: *commonEnvironment
+    volumes:
+      - ./templates/dnsmasq-internal:/etc/dnsmasq-templates
+    volumes_from: 
+      - php
+    networks:
+      vpc:
+        ipv4_address: ${BUTLER_DNS_INTERNAL_IP:-10.172.0.101}
+
 volumes:
   composer:
+
+networks:
+  vpc:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: ${BUTLER_SUBNET:-10.172.0.0/16}
+        gateway: ${BUTLER_GATEWAY:-10.172.0.1}
