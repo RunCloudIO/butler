@@ -83,6 +83,20 @@ alias composer="butler composer"
 
 After that, `source ~/.bash_profile` and you may use `valet`, `php`, `composer` just like you have installed them natively.
 
+# Comparison With
+
+### Laravel Valet
+
+As stated, Butler aiming to follow Laravel Valet closely. Thus, it should be same with Laravel Valet in term of usage and experience. The only difference is, Butler use Docker rather than installing dependency using `brew` directly into MacOS.
+
+Butler aim to keep development machine clean without installing `php`, `nginx` and `dnsmasq`. That is all what Laravel Valet is doing. It doesn't matter if you want to install other tools (`mysql`, `redis`, `supervisor`) directly inside your MacOS because it is not in Laravel Valet scope.
+
+### Laravel Sail
+
+Laravel Sail is new development tools from Laravel. Same as Butler, it is using Docker to accomplish the task. However, Laravel Sail is aiming for per project based rather than setup once and forget everything. You also need to setup Sail for each Laravel instance that you have to make use of Sail. And **Sil only works** with Laravel.
+
+If you dig down into Sail codes, you can see that it is installing every binary inside single Docker container. The problem happen when you want to launch multiple Sail instance. For each Sail instance, you need to configure different port for different project if you want to keep everything up at the same time. Although this can be solve by using [Traefik](https://hub.docker.com/_/traefik), you still need to learn how to use Traefik and configure Sail configuration to use Traefik. So, each of your Laravel Sail instance will have Traefik configuration rather than setup once (Laravel Valet) and run forever.
+
 # Usage
 
 ### Basic usage
