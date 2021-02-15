@@ -161,6 +161,16 @@ You may create another folder inside `DEFAULT_WWW_PATH` and register it as new p
         └── frontend
             └── index.php
 ```
+Laravel Valet command
+
+```
+$ cd <path to DEFAULT_WWW_PATH>
+$ butler park default
+$ butler link link1
+$ butler link link2
+$ butler park project1
+$ butler park project2
+```
 
 ### Moving working directory
 
