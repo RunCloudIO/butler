@@ -93,7 +93,7 @@ Butler aim to keep development machine clean without installing `php`, `nginx` a
 
 ### Laravel Sail
 
-Laravel Sail is new development tools from Laravel. Same as Butler, it is using Docker to accomplish the task. However, Laravel Sail is aiming for per project based rather than setup once and forget everything. You also need to setup Sail for each Laravel instance that you have to make use of Sail. And **Sil only works** with Laravel.
+Laravel Sail is new development tools from Laravel. Same as Butler, it is using Docker to accomplish the task. However, Laravel Sail is aiming for per project based rather than setup once and forget everything. You also need to setup Sail for each Laravel instance that you have to make use of Sail. And **Sail only works** with Laravel.
 
 If you dig down into Sail codes, you can see that it is installing every binary inside single Docker container. The problem happen when you want to launch multiple Sail instance. For each Sail instance, you need to configure different port for different project if you want to keep everything up at the same time. Although this can be solve by using [Traefik](https://hub.docker.com/_/traefik), you still need to learn how to use Traefik and configure Sail configuration to use Traefik. So, each of your Laravel Sail instance will have Traefik configuration rather than setup once (Laravel Valet) and run forever.
 
