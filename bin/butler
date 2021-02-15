@@ -209,6 +209,20 @@ function trust_new_certificates {
     fi
 }
 
+function valet_trust {
+    shift 1
+
+    if [ "$1" == "--off" ]; then
+        sudo rm /etc/sudoers.d/butler 2> /dev/null
+
+        echo -e "${WHITE}Sudoers entries have been removed for Butler.${NC}"
+    else 
+        echo -e "Cmnd_Alias BUTLER = /usr/local/bin/butler *\n%admin ALL=(root) NOPASSWD:SETENV: BUTLER" | sudo tee /etc/sudoers.d/butler > /dev/null
+
+        echo -e "${WHITE}Sudoers entries have been added for Butler.${NC}"
+    fi
+}
+
 function reload_webserver {
     docker restart butler_webserver_1 > /dev/null 2>&1
 }
@@ -320,6 +334,8 @@ if [[ "$1" == "php" || "$1" == "valet" || $1 == "composer" || $1 == "artisan" ]]
         valet_unsecure "$@"
     elif [[ $COMMAND == "valet" && $1 == "tld" ]]; then
         valet_tld "$@"
+    elif [[ $COMMAND == "valet" && $1 == "trust" ]]; then
+        valet_trust "$@"
     elif [[ $COMMAND == "artisan" || $command == "art" ]]; then
         shift 1
         docker exec -i \
@@ -344,6 +360,8 @@ elif [ "$1" == "tld" ];then
     valet_tld "$@"
 elif [ "$1" == "down" ];then
     docker-compose -p butler stop
+elif [ "$1" == "trust" ];then
+    valet_trust "$@"
 else
     workdir=$(get_workdir)
 

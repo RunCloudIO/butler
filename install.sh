@@ -63,12 +63,6 @@ butler start
 docker exec -i -w /valet/master butler_php_1 composer install -vvv
 butler install
 
-# echo "Register as sudoers..."
-
-# echo -e "Cmnd_Alias BUTLER = /usr/local/bin/butler *
-# %admin ALL=(root) NOPASSWD:SETENV: BUTLER" | sudo tee /etc/sudoers.d/butler > /dev/null
-
-
 echo -e "${WHITE}
 
 

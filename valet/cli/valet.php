@@ -271,6 +271,15 @@ if (is_dir(VALET_HOME_PATH)) {
     })->descriptions('Determine if this is the latest version of Valet');
 
     /**
+     * Install the sudoers.d entries so password is no longer required.
+     */
+    $app->command('trust [--off]', function () {
+
+    })->descriptions('Add sudoers files for Brew and Valet to make Valet commands run without passwords', [
+        '--off' => 'Remove the sudoers files so normal sudo password prompts are required.',
+    ]);
+
+    /**
      * Configure or display the directory-listing setting.
      */
     $app->command('directory-listing [status]', function ($status = null) {
