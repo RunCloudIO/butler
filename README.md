@@ -204,6 +204,14 @@ apps:
 
 Then start PM2 with `pm2 start pm2-queue.yaml`
 
+### Docker networking config
+
+It may be odd to see this package included Docker networking config with static IP Address for each services. It is needed, let me tell you why. 
+
+First of all, you can see we are running **two** instances of DNSMasq. It needed two because, 1 is for our Mac to resolve the .test (or something else) domain and another one is for the container to resolve the .test domain.
+
+Why do we need it? Ok, if you are running a simple PHP application, it would not make any sense in this. But, if your PHP Application call other .test domain, probably calling API, it will resolve to webserver service. Without having the internal-dns, all container will only resolve to `127.0.0.1`. So, php container need to know that .test domain will be pointed to webserver service.
+
 # Troubleshooting Guides
 
 ### Valet 404 Page
