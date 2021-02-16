@@ -72,7 +72,7 @@ $ ./install.sh
 `install.sh` command will not replace your `docker-compose.yaml` and `.env`. But if we release a new update to that compose file, you can just delete your compose file and running `install.sh` will re-add latest `docker-composer.yaml`.
 
 # Tips & Tricks
-
+### Alias
 To make your life easier, it is better to use your daily command rather than invoking `butler` directly. Before doing this, make sure you have **REMOVE** Laravel Valet completely. So, here it is. Edit `~/.bash_profile` and append these lines:
 
 ```
@@ -83,6 +83,9 @@ alias composer="butler composer"
 
 After that, `source ~/.bash_profile` and you may use `valet`, `php`, `composer` just like you have installed them natively.
 
+### Connecting to host
+
+Since your application is running inside a container, you can't use `127.0.0.1` to connect to database, Redis, etc. To solve this, Butler retain the functionality from Docker for Mac where you can call host by their domain name. Inside your application, you need to change `127.0.0.1` to `host.docker.internal` to connect to host.
 # Comparison With
 
 ### Laravel Valet
