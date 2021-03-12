@@ -85,7 +85,7 @@ After that, `source ~/.bash_profile` and you may use `valet`, `php`, `composer` 
 
 ### Connecting to host
 
-Since your application is running inside a container, you can't use `127.0.0.1` to connect to database, Redis, etc. To solve this, Butler retain the functionality from Docker for Mac where you can call host by their domain name. Inside your application, you need to change `127.0.0.1` to `host.docker.internal` to connect to host.
+Since your application is running inside a container, you can't use `127.0.0.1` to connect to database, Redis, etc. To solve this, Butler retain the functionality from Docker for Mac where you can call host by their domain name. Inside your application, you need to change from `127.0.0.1` to `host.docker.internal` to connect to host.
 # Comparison With
 
 ### Laravel Valet
