@@ -183,7 +183,7 @@ To change this, you need to update `.env` file and `DEFAULT_WWW_PATH` to a new p
 
 ### Laravel Queue
 
-To run backend process (eg: Laravel Queue), you need process manager. Two widely know process manager are [Supervisor](http://supervisord.org/) and [PM2](https://www.npmjs.com/package/pm2). You **can't** run both of this process manager inside Docker container because it does not have the php binary and butler script inside the container. So both of this software need to be installed natively inside your system
+To run backend process (eg: Laravel Queue), you need process manager. Two widely known process managers are [Supervisor](http://supervisord.org/) and [PM2](https://www.npmjs.com/package/pm2). You **can't** run both of this process manager inside Docker container because it does not have the php binary and butler script inside the container. So both of this software need to be installed natively inside your system.
 
 For Supervisor, you can create the config as follow:
 
