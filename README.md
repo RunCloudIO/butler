@@ -183,11 +183,24 @@ To change this, you need to update `.env` file and `DEFAULT_WWW_PATH` to a new p
 
 ### Laravel Queue
 
-**[Need better documentation]**
+To run backend process (eg: Laravel Queue), you need process manager. Two widely know process manager are [Supervisor](http://supervisord.org/) and [PM2](https://www.npmjs.com/package/pm2). You **can't** run both of this process manager inside Docker container because it does not have the php binary and butler script inside the container. So both of this software need to be installed natively inside your system
 
-Since you didn't install PHP inside your Mac, you also can't run `php artisan queue:work` using Supervisor. Right now I have no idea how to run Supervisor, but there is a way without using Supervisor, which is using [PM2](https://www.npmjs.com/package/pm2). This suggestion still need a better implementation.
+For Supervisor, you can create the config as follow:
 
-Then create PM2 config inside the same folder, `pm2-queue.yaml`. The content is
+```conf
+[program:<project-name>]
+environment=NOTTY=true
+command=butler php artisan queue:work --tries=1
+directory=/path/to/laravel
+redirect_stderr=true
+autostart=true
+autorestart=true
+user=<your username>
+numprocs=1
+process_name=%(program_name)s_%(process_num)s
+```
+
+For PM2, you may create `pm2-queue.yaml` with below content:
 
 ```yaml
 apps:
