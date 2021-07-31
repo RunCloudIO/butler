@@ -8,6 +8,12 @@ UNAMEOUT="$(uname -s)"
 WHITE='\033[1;37m'
 NC='\033[0m'
 
+if [[ $NOTTY == "true" ]];then 
+    TTY=""
+else
+    TTY="t"
+fi
+
 # Function that outputs Butler is not running...
 function butler_is_not_running {
     echo -e "${WHITE}Butler is not running.${NC}" >&2
@@ -117,7 +123,7 @@ function valet_tld {
     fi
 
     # pass to valet
-    docker exec -i \
+    docker exec -i${TTY} \
         -w $workdir \
         butler_php_1 \
         valet tld "$@"
@@ -142,7 +148,7 @@ function valet_secure {
         CN=$1
     fi
 
-    docker exec -i \
+    docker exec -i${TTY} \
         -w $workdir \
         butler_php_1 \
         valet secure $CN
@@ -160,7 +166,7 @@ function valet_unsecure {
         CN=$1
     fi
 
-    docker exec -i \
+    docker exec -i${TTY} \
         -w $workdir \
         butler_php_1 \
         valet unsecure $CN
@@ -175,7 +181,7 @@ function valet_proxy {
 
     CN=$1
 
-    docker exec -i \
+    docker exec -i${TTY} \
         butler_php_1 \
         valet proxy "$@"
         
@@ -189,7 +195,7 @@ function valet_unproxy {
 
     CN=$1
     
-    docker exec -i \
+    docker exec -i${TTY} \
         -w $workdir \
         butler_php_1 \
         valet unproxy "$@"
@@ -292,7 +298,7 @@ elif [ "$1" == "restart" ];then
     exit 0
 elif [ "$1" == "reload" ];then
     echo -e "${WHITE}Reload all butler related processes...${NC}" >&2
-    docker exec -i \
+    docker exec -i${TTY} \
         butler_php_1 \
         valet install
     docker-compose -p butler up -d
@@ -338,12 +344,12 @@ if [[ "$1" == "php" || "$1" == "valet" || $1 == "composer" || $1 == "artisan" ]]
         valet_trust "$@"
     elif [[ $COMMAND == "artisan" || $command == "art" ]]; then
         shift 1
-        docker exec -i \
+        docker exec -i${TTY} \
             -w $workdir \
             butler_php_1 \
             php artisan "$@"
     else
-        docker exec -i \
+        docker exec -i${TTY} \
             -w $workdir \
             butler_php_1 \
             $COMMAND "$@"
@@ -365,7 +371,7 @@ elif [ "$1" == "trust" ];then
 else
     workdir=$(get_workdir)
 
-    docker exec -i \
+    docker exec -i${TTY} \
         -w $workdir \
         butler_php_1 \
         valet "$@"
